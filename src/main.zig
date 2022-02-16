@@ -1,11 +1,23 @@
 const std = @import("std");
 
+var what = std.meta.Struct;
+
 fn describeType(comptime obj: type) type {
     var fields = @typeInfo(obj).Struct.fields;
-    var description: []const u8 = "fields: ";
+    var description: []const u8 = "\n\tfields: ";
     for (fields) |field, index| {
         description = description ++ (if (index > 0) ", " else "") ++ field.name;
     }
+    var decls = @typeInfo(obj).Struct.decls;
+    description = description ++ "\n\tdeclarations: ";
+    var functionDescription: []const u8 = "";
+    for (decls) |decl| {
+        functionDescription = switch (decl.data) {
+            .Fn => functionDescription ++ (if (functionDescription.len > 0) ", " else "") ++ decl.name,
+            else => functionDescription,
+        };
+    }
+    description = description ++ functionDescription;
     @compileError(description);
 }
 
