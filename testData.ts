@@ -1,18 +1,25 @@
-type Recipe<Names extends string> = {
+type Key = string | number | symbol;
+type Recipe<ParentRecipes extends { [key: Key]: any }> = {
   readonly other: string,
-  readonly dependencies?: { [key in Names]?: number },
+  readonly requiresRecipe?: { [key in keyof ParentRecipes]?: number },
 }
-function validateRecipes<Names extends string>(recipes: Record<Names, Recipe<Names>>) { return recipes; }
+type Recipes<ParentRecipes extends Recipes<any>> = { [key in keyof ParentRecipes ]: Recipe<ParentRecipes> };
+function validateRecipes<T extends Recipes<T>>(recipes: T & Recipes<T>) { return recipes; }
 
 const recipes = validateRecipes({
-  What: {
+  "Shrimp": {
     other: "ho",
   },
-  Hey: {
-    other: "Hi",
-    dependencies: { What: 1 },
-  }
+  "Pasta with Shrimp": {
+    other: "what's new",
+    requiresRecipe: { "Shrimp": 1 },
+  },
 });
+
+const recipeDerivative: { [key in keyof typeof recipes]: string } = {
+  "Pasta with Shrimp": "hey",
+  "Shrimp": "what",
+};
 
 
 export const test = <const>{
