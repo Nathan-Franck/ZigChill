@@ -1,4 +1,5 @@
 const std = @import("std");
+const recipes = @import("./recipes.zig").recipes;
 
 var what = std.meta.Struct;
 
@@ -27,14 +28,22 @@ pub fn main() anyerror!void {
     defer file.close();
     var length = try file.getEndPos();
     var allocator = std.heap.page_allocator;
+
+    const SimpleStruct = struct {
+        one: u8,
+        two: u9,
+    };
+    const simpleValue: SimpleStruct = .{
+        .one = 1,
+        .the = 1,
+    };
+    _ = simpleValue;
     // Should be some means of displaying what methods can be called from allocator, since the current tooling doesn't give me anything to work with.
-    describeType(@TypeOf(allocator));
+    // describeType(@TypeOf(allocator));
 
     var buffer = try allocator.alloc(u8, length);
     _ = try file.readAll(buffer);
     std.log.info("Here's the resulting output!\n{s}", .{buffer});
-}
 
-test "basic test" {
-    try std.testing.expectEqual(10, 3 + 7);
+    _ = recipes;
 }
